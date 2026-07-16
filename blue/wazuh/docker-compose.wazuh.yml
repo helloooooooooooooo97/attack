@@ -1,0 +1,112 @@
+# Wazuh 单节点（可选）— 资源占用高，需 Docker 内存 ≥ 6GB
+# 启动: make wazuh-up
+
+name: redblue-wazuh
+
+networks:
+  net-blue:
+    external: true
+    name: redblue_net-blue
+
+volumes:
+  wazuh-indexer-data:
+  wazuh-manager-data:
+  wazuh-dashboard-data:
+  suricata-logs:
+    external: true
+    name: redblue_suricata-logs
+  nginx-logs:
+    external: true
+    name: redblue_nginx-logs
+
+services:
+  wazuh.indexer:
+    image: wazuh/wazuh-indexer:4.9.2
+    container_name: rb-wazuh-indexer
+    hostname: wazuh.indexer
+    environment:
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=${WAZUH_DASHBOARD_PASSWORD:-SecretPassword}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - wazuh-indexer-data:/var/lib/wazuh-indexer
+      - ./config/wazuh_indexer_ssl_certs:/usr/share/wazuh-indexer/certs:ro
+      - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/opensearch.yml:ro
+      - ./config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/opensearch-security/internal_users.yml:ro
+    networks:
+      net-blue:
+        aliases:
+          - wazuh.indexer
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sk https://localhost:9200 >/dev/null || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 40
+      start_period: 90s
+    restart: unless-stopped
+
+  wazuh.manager:
+    image: wazuh/wazuh-manager:4.9.2
+    container_name: rb-wazuh-manager
+    hostname: wazuh.manager
+    environment:
+      - INDEXER_URL=https://wazuh.indexer:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=${WAZUH_DASHBOARD_PASSWORD:-SecretPassword}
+      - FILEBEAT_SSL_VERIFICATION_MODE=none
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/root-ca.pem
+      - SSL_CERTIFICATE=/etc/ssl/filebeat.pem
+      - SSL_KEY=/etc/ssl/filebeat.key
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=${WAZUH_DASHBOARD_PASSWORD:-SecretPassword}
+    volumes:
+      - wazuh-manager-data:/var/ossec/data
+      - suricata-logs:/var/log/suricata:ro
+      - nginx-logs:/var/log/nginx:ro
+      - ./config/wazuh_manager/local_rules.xml:/var/ossec/etc/rules/local_rules.xml:ro
+      - ./config/wazuh_manager/ossec.conf:/wazuh-config-mount/etc/ossec.conf:ro
+      - ./config/wazuh_indexer_ssl_certs/root-ca.pem:/etc/ssl/root-ca.pem:ro
+      - ./config/wazuh_indexer_ssl_certs/filebeat.pem:/etc/ssl/filebeat.pem:ro
+      - ./config/wazuh_indexer_ssl_certs/filebeat-key.pem:/etc/ssl/filebeat.key:ro
+    networks:
+      net-blue:
+        aliases:
+          - wazuh.manager
+    depends_on:
+      wazuh.indexer:
+        condition: service_healthy
+    restart: unless-stopped
+
+  wazuh.dashboard:
+    image: wazuh/wazuh-dashboard:4.9.2
+    container_name: rb-wazuh-dashboard
+    hostname: wazuh.dashboard
+    environment:
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=${WAZUH_DASHBOARD_PASSWORD:-SecretPassword}
+      - WAZUH_API_URL=https://wazuh.manager
+      - DASHBOARD_USERNAME=kibanaserver
+      - DASHBOARD_PASSWORD=${WAZUH_DASHBOARD_PASSWORD:-SecretPassword}
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=${WAZUH_DASHBOARD_PASSWORD:-SecretPassword}
+    ports:
+      - "${WAZUH_DASHBOARD_PORT:-5601}:5601"
+    volumes:
+      - wazuh-dashboard-data:/usr/share/wazuh-dashboard/data
+      - ./config/wazuh_dashboard/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml:ro
+      - ./config/wazuh_indexer_ssl_certs/root-ca.pem:/usr/share/wazuh-dashboard/certs/root-ca.pem:ro
+      - ./config/wazuh_indexer_ssl_certs/wazuh.dashboard.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem:ro
+      - ./config/wazuh_indexer_ssl_certs/wazuh.dashboard-key.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem:ro
+    networks:
+      - net-blue
+    depends_on:
+      - wazuh.indexer
+      - wazuh.manager
+    restart: unless-stopped

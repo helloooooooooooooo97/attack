@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>内部运维面板</title>
+  <style>
+    :root { color-scheme: light; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "IBM Plex Sans", "Noto Sans SC", sans-serif;
+      background: linear-gradient(160deg, #0b1f2a 0%, #143447 45%, #1c4d3d 100%);
+      color: #e8f1f5;
+      display: grid;
+      place-items: center;
+    }
+    main {
+      width: min(420px, 92vw);
+      padding: 2rem;
+      background: rgba(8, 20, 28, 0.72);
+      border: 1px solid rgba(120, 200, 180, 0.25);
+    }
+    h1 { margin: 0 0 0.5rem; font-size: 1.4rem; letter-spacing: 0.04em; }
+    p { margin: 0 0 1.2rem; color: #9db6c2; font-size: 0.95rem; }
+    a {
+      color: #7ddecb;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(125, 222, 203, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>内部运维面板</h1>
+    <p>仅限授权演练。登录后可查看安全区资产标记。</p>
+    <p><a href="/secure/flag.txt">进入安全区</a></p>
+  </main>
+</body>
+</html>

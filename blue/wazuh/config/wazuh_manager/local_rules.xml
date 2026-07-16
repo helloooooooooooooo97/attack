@@ -1,0 +1,24 @@
+<!-- 红蓝对抗本地规则 -->
+<group name="redblue,">
+  <rule id="100100" level="10">
+    <if_sid>86601</if_sid>
+    <field name="alert.signature">REDBLUE</field>
+    <description>RedBlue Suricata custom alert</description>
+  </rule>
+
+  <rule id="100101" level="10">
+    <match>union</match>
+    <match>select</match>
+    <description>Possible SQL injection in nginx access log</description>
+  </rule>
+
+  <rule id="100102" level="7">
+    <match> 401 </match>
+    <description>HTTP 401 Unauthorized - possible brute force</description>
+  </rule>
+
+  <rule id="100103" level="12">
+    <match>lab-exfil</match>
+    <description>Lab exfil marker detected</description>
+  </rule>
+</group>

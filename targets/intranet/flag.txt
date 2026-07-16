@@ -1,0 +1,1 @@
+FLAG{intranet_weak_creds_lateral_01}

@@ -1,0 +1,56 @@
+%YAML 1.1
+---
+# 精简配置：命令行 -i eth0 抓包，避免 af-packet 段与 Mac/Docker 冲突
+
+vars:
+  address-groups:
+    HOME_NET: "any"
+    EXTERNAL_NET: "any"
+
+default-log-dir: /var/log/suricata
+
+stats:
+  enabled: yes
+  interval: 30
+
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: eve.json
+      community-id: true
+      types:
+        - alert:
+            tagged-packets: yes
+        - http:
+            extended: yes
+        - dns
+        - tls
+        - flow
+        - stats:
+            totals: yes
+
+logging:
+  default-log-level: notice
+  outputs:
+    - console:
+        enabled: yes
+
+app-layer:
+  protocols:
+    http:
+      enabled: yes
+    tls:
+      enabled: yes
+    dns:
+      tcp:
+        enabled: yes
+      udp:
+        enabled: yes
+
+detect:
+  profile: medium
+
+default-rule-path: /var/lib/suricata/rules
+rule-files:
+  - local.rules
