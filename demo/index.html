@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>红蓝对抗 · 本地靶场</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true">
+    <div class="grid"></div>
+    <div class="beam beam-red"></div>
+    <div class="beam beam-blue"></div>
+    <div class="scan"></div>
+  </div>
+
+  <header class="top">
+    <span class="mark">RB-LAB</span>
+    <nav>
+      <a href="#services">服务</a>
+      <a href="#playbooks">剧本</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="brand">红蓝对抗</p>
+      <h1>本地靶场，一键开打</h1>
+      <p class="lead">DVWA · Juice Shop · Suricata · EveBox，红队进攻与蓝队观测同屏演练。</p>
+      <div class="cta">
+        <a class="btn primary" href="#services">查看入口</a>
+        <a class="btn ghost" href="#playbooks">演练剧本</a>
+      </div>
+    </section>
+
+    <section id="services" class="section">
+      <h2>服务入口</h2>
+      <p class="section-lead">靶标与观测面通过 gateway 统一暴露到本机端口。</p>
+      <ul class="service-list">
+        <li>
+          <span class="tag red">红</span>
+          <div>
+            <strong>DVWA</strong>
+            <span>localhost:8080</span>
+          </div>
+        </li>
+        <li>
+          <span class="tag red">红</span>
+          <div>
+            <strong>Juice Shop</strong>
+            <span>localhost:3000</span>
+          </div>
+        </li>
+        <li>
+          <span class="tag red">红</span>
+          <div>
+            <strong>内网面板</strong>
+            <span>localhost:8081</span>
+          </div>
+        </li>
+        <li>
+          <span class="tag blue">蓝</span>
+          <div>
+            <strong>EveBox</strong>
+            <span>localhost:5636</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section id="playbooks" class="section">
+      <h2>演练剧本</h2>
+      <p class="section-lead">从注入到弱口令，再到 IDS 告警，按序跑完一整轮攻防闭环。</p>
+      <ol class="playbooks">
+        <li><strong>01</strong> SQL 注入 + IDS</li>
+        <li><strong>02</strong> 弱口令内网面板</li>
+        <li><strong>03</strong> 异常探测触发 IDS</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <p>仅限本机 / 授权演练环境 · 沙箱演示页</p>
+  </footer>
+
+  <script src="./main.js"></script>
+</body>
+</html>
